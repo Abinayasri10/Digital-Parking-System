@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kongu Engineering College Wayfinding</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    #map {
+      height: 500px;
+      width: 100%;
+      max-width: 800px;
+      margin-top: 20px;
+    }
+    .location-select {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wayfinding Assistance - Kongu Engineering College</h1>
+  <div class="location-select">
+    <label for="locations">Choose a Location:</label>
+    <select id="locations">
+      <option value="11.2647035,77.5992806">Main Entrance</option>
+      <option value="11.263800,77.601200">Library</option>
+      <option value="11.263200,77.600000">Computer Science Department</option>
+      <!-- Add more locations as needed -->
+    </select>
+    <button onclick="navigate()">Navigate</button>
+  </div>
+
+  <div id="map"></div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+  <script>
+    let map, marker;
+
+    function initMap() {
+      const collegeLocation = { lat: 11.2647035, lng: 77.5992806 };
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: collegeLocation,
+        zoom: 17,
+      });
+      marker = new google.maps.Marker({
+        position: collegeLocation,
+        map: map,
+        title: "Kongu Engineering College",
+      });
+    }
+
+    function navigate() {
+      const locationSelect = document.getElementById("locations");
+      const selectedCoordinates = locationSelect.value.split(',');
+      const destination = {
+        lat: parseFloat(selectedCoordinates[0]),
+        lng: parseFloat(selectedCoordinates[1]),
+      };
+
+      marker.setPosition(destination);
+      map.setCenter(destination);
+    }
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>
