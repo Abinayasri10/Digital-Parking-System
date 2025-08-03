@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Booking Payment</title>
+
+    <!-- Razorpay Checkout script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: url('background-image.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('img.jpg');
+        }
+
+        .payment-box {
+            background-color: rgba(255, 255, 255, 0.8);
+            width: 500px;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .payment-box h1 {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .pay-button {
+            background-color: #00c6ff;
+            color: white;
+            font-size: 16px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .pay-button:hover {
+            background-color: #0072ff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div class="payment-box">
+        <h1>Parking Booking Payment</h1>
+        <button id="pay-button" class="pay-button">Pay with Google Pay (UPI)</button>
+    </div>
+
+    <script>
+        document.getElementById('pay-button').onclick = function() {
+            var options = {
+                "key": "rzp_test_2QDKgT0q0ieVqG",
+                "amount": "1000",
+                "currency": "INR",
+                "name": "Smart Parking",
+                "description": "Parking Fee",
+                "image": "images/logo.png",
+                "prefill": {
+                    "email": "user_email@example.com",
+                    "contact": "user_contact_number"
+                },
+                "method": {
+                    "upipay": true
+                },
+                "handler": function(response) {
+                    fetch('/process_payment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Payment successful!');
+                        } else {
+                            alert('Payment failed!');
+                        }
+                    })
+                    .catch(error => console.error('Payment error:', error));
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        };
+    </script>
+
+</body>
+</html>

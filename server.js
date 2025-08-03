@@ -1,73 +1,32 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
+const app = express();
 const path = require('path');
 
-const app = express();
-const PORT = 3001;
-
-// Middleware to parse form data and JSON
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-// Serve static files from the 'public' folder
+// Middleware to serve static files (like images, CSS)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Parse JSON request bodies
+app.use(express.json());
 
-// Nodemailer transporter setup (replace with your email and app password)
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'abinayajegadeeshwaran@gmail.com',  // Replace with your email
-        pass: 'tkve tklx gkgn dqmq'       // Replace with your app password
-    }
-});
-
-// Route for the ticket booking form (HTML form should post here)
-app.post('/send-ticket', (req, res) => {
-    const { name, vehicle, start, end, slot, email } = req.body;
-
-    // Log the form data to ensure it's received correctly
-    console.log('Received Ticket Details:', req.body);
-
-    // Validate the form inputs
-    if (!name || !vehicle || !start || !end || !slot || !email) {
-        return res.status(400).send('All fields are required');
-    }
-
-    // Email content
-    const mailOptions = {
-        from: 'abinayajegadeeshwaran@gmail.com',
-        to: email,
-        subject: 'Your Parking Ticket Details',
-        html: `
-            <h2>Parking Ticket</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Vehicle:</strong> ${vehicle}</p>
-            <p><strong>Start Time:</strong> ${start}</p>
-            <p><strong>End Time:</strong> ${end}</p>
-            <p><strong>Slot Number:</strong> ${slot}</p>
-            <p>Thank you for using our service!</p>
-        `
-    };
-
-    // Send the email
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Error sending email:', error);
-            return res.status(500).send('Error sending email');
-        }
-        console.log('Email sent:', info.response);
-        res.send('Ticket sent successfully!');
-    });
-});
-
-// Default route to check server health
+// Endpoint to serve the payment page (index.html)
 app.get('/', (req, res) => {
-    res.send('Server is up and running!');
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+// Endpoint to process Razorpay payment verification
+app.post('/process_payment', (req, res) => {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+    // Here you would need to verify the payment signature with Razorpay's API
+    // This involves sending a request to Razorpay's server to validate the payment
+    // For now, we'll mock the success
+    console.log('Payment data received:', req.body);
+
+    // Mocking successful payment response
+    res.json({ success: true, message: 'Payment successfully verified!' });
+});
+
+// Start the server on port 3000
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
 });
